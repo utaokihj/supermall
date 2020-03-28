@@ -35,16 +35,20 @@ export default {
     })
 
     /* 监听滚动位置 */
-    this.scroll.on('scroll', (position) => {
-      /* console.log(position) */
-      this.$emit('scroll', position)
-    })
+    if(this.probeType === 2 || this.probeType === 3) {
+      this.scroll.on('scroll', (position) => {
+        /* console.log(position) */
+        this.$emit('scroll', position)
+      })
+    }
 
-    /* 监听上拉事件 */
-    this.scroll.on('pullingUp', () => {
-      /* console.log('上拉加载更多') */
-      this.$emit('pullingUp')
-    })
+    /* 监听 scroll 滚动到底部 */
+    if(this.pullUpLoad) {
+      this.scroll.on('pullingUp', () => {
+        /* console.log('监听滚动到底部') */
+        this.$emit('pullingUp')
+      })
+    }
   },
   methods: {
     /* 回到顶部 */
@@ -54,10 +58,14 @@ export default {
 
     /* 上拉加载更多的刷新 */
     finishPullUp() {
-      this.scroll.finishPullUp()
+      this.scroll && this.scroll.finishPullUp()
     },
     refresh() {
       this.scroll && this.scroll.refresh()
+      console.log('图片加载完成')
+    },
+    getScrollY() {
+      return this.scroll ? this.scroll.y : 0
     }
   }
 }

@@ -30,6 +30,7 @@ export default {
   text-align: center;
   justify-content: space-around;
   font-size: 14px;
+  background-color: #fff;
 
   padding: 10px 0 20px;
   border-bottom: 8px solid #eee;
