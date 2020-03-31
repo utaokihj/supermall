@@ -48,10 +48,10 @@ import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backTop/BackTop'
 
 import {getHomeMultidata, getHomeGoods} from 'network/home'
-import {debounce} from 'common/utils'
+/* import {debounce} from 'common/utils'*/
+import {itemListenerMixin, backTopMixin} from 'common/mixin'
 
 export default {
   name: 'Home',
@@ -62,9 +62,9 @@ export default {
     NavBar,
     TabControl,
     GoodList,
-    Scroll,
-    BackTop
+    Scroll
   },
+  mixins: [itemListenerMixin, backTopMixin],
   data() {
     return {
       banners: [],
@@ -75,7 +75,6 @@ export default {
         'sell': {page:0, list: []},
       },
       currentType: 'pop',
-      isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0
@@ -91,7 +90,11 @@ export default {
     this.$refs.scroll.refresh()
   },
   deactived() {
+    /* baoxun Y 值 */
     this.saveY = this.$refs.scroll.getScrollY()
+
+    /* 取消全局事件的监听 */
+    this.$bus.$off('itemImgLoad', this.itemImgListener)
   },
   created() {
     // 请求多个数据
@@ -102,14 +105,17 @@ export default {
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
   },
-  mounted() {
-    /* 监听 goodsListItem 图片加载完成的事件监听 */
+ /*  mounted() {
+    //监听 goodsListItem 图片加载完成的事件监听
     const refresh = debounce(this.$refs.scroll.refresh, 200)
-    this.$bus.$on('itemImageLoad', () => {
-      /* this.$refs.scroll.refresh() */
+
+    //对监听的事件进行保存
+    this.itemImgListener = () => {
       refresh()
-    })
-  },
+    }
+
+    this.$bus.$on('itemImageLoad', this.itemImgListener)
+  }, */
   methods: {
     /* ----------------- 事件监听相关方法 ------------------ */
     /* tab 分类选项 */
@@ -127,10 +133,6 @@ export default {
       }
       this.$refs.tabControl1.currentIndex = index
       this.$refs.tabControl2.currentIndex = index
-    },
-    /* 回到顶部 */
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0)
     },
     contentScroll(position) {
       /* 判断 backTop 是否显示 */
